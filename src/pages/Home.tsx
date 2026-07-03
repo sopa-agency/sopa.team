@@ -57,7 +57,7 @@ export function Home() {
           <div style={{ fontSize: 14, color: 'var(--ink)' }}>
             <span style={{ color: 'var(--ink-strong)' }}>~/</span>pessoas <span style={{ color: 'var(--faint)' }}>— 10</span>
           </div>
-          <a data-route="pessoas" href="#/pessoas" style={{ fontSize: 12, color: 'var(--muted)' }}>
+          <a data-route="pessoas" href="/pessoas" style={{ fontSize: 12, color: 'var(--muted)' }}>
             ver diretório →
           </a>
         </div>
@@ -91,7 +91,7 @@ export function Home() {
           <div style={{ fontSize: 14, color: 'var(--ink)' }}>
             <span style={{ color: 'var(--ink-strong)' }}>~/</span>feed <span style={{ color: 'var(--faint)' }}>— log</span>
           </div>
-          <a data-route="feed" href="#/feed" style={{ fontSize: 12, color: 'var(--muted)' }}>
+          <a data-route="feed" href="/feed" style={{ fontSize: 12, color: 'var(--muted)' }}>
             tudo · making-of · vídeo · estudo →
           </a>
         </div>
@@ -133,7 +133,7 @@ export function Home() {
           <div style={{ fontSize: 14, color: 'var(--ink)' }}>
             <span style={{ color: 'var(--ink-strong)' }}>~/</span>projetos <span style={{ color: 'var(--faint)' }}>— produção recente</span>
           </div>
-          <a data-route="projetos" href="#/projetos" style={{ fontSize: 12, color: 'var(--muted)' }}>
+          <a data-route="projetos" href="/projetos" style={{ fontSize: 12, color: 'var(--muted)' }}>
             arquivo completo →
           </a>
         </div>

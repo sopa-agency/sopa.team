@@ -12,7 +12,7 @@ export function Post() {
             <div style={{ fontSize: 10, color: 'var(--ink-strong)', textTransform: 'uppercase' }}>dev · ai · web3</div>
           </div>
         </div>
-        <a data-route="perfil" data-param="xvlad" href="#/perfil/xvlad" style={{ fontSize: 10.5, color: 'var(--faint)', marginTop: 10, display: 'block' }}>
+        <a data-route="perfil" data-param="xvlad" href="/perfil/xvlad" style={{ fontSize: 10.5, color: 'var(--faint)', marginTop: 10, display: 'block' }}>
           ver perfil →
         </a>
       </Panel>
@@ -144,8 +144,8 @@ export function Post() {
         </div>
 
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: 24, paddingTop: 16, borderTop: '1px solid rgba(var(--line-rgb), .12)', fontSize: 11, color: 'var(--muted)' }}>
-          <a data-route="feed" href="#/feed" style={{ color: 'var(--muted)', cursor: 'pointer' }}>← voltar ao feed</a>
-          <a data-route="contato" href="#/contato" style={{ color: 'var(--ink-strong)', cursor: 'pointer' }}>tem um projeto assim? chama →</a>
+          <a data-route="feed" href="/feed" style={{ color: 'var(--muted)', cursor: 'pointer' }}>← voltar ao feed</a>
+          <a data-route="contato" href="/contato" style={{ color: 'var(--ink-strong)', cursor: 'pointer' }}>tem um projeto assim? chama →</a>
         </div>
       </Panel>
     </Frame>

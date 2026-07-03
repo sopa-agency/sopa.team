@@ -1,7 +1,7 @@
 import type { ReactNode } from 'react'
 import { NAV } from '../data'
 import type { Route } from '../data'
-import { navigate, useRouteDelegate } from '../router'
+import { navigate, useRouteDelegate, href } from '../router'
 import { useTheme, cycleTheme, themeLabel } from '../theme'
 
 /**
@@ -76,7 +76,7 @@ function Sidebar({
               key={n.route}
               className={active === n.route ? 'active' : undefined}
               data-route={n.route}
-              href={`#/${n.route}`}
+              href={href(n.route)}
             >
               ▸ {n.label} {n.count && <span className="count">{n.count}</span>}
             </a>
