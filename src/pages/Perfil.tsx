@@ -1,5 +1,5 @@
 import { Frame, ThemeDot } from '../components/Frame'
-import { Panel, Hatch, KeyVals } from '../components/ui'
+import { Panel, Hatch, KeyVals, Avatar } from '../components/ui'
 import { PEOPLE } from '../data'
 
 const LINKS = ['site ↗', 'instagram ↗', 'are.na ↗', 'behance ↗']
@@ -72,7 +72,7 @@ export function Perfil({ handle }: { handle?: string }) {
       {/* header */}
       <Panel tag="[ perfil ]" style={{ padding: '22px 18px 18px' }}>
         <div className="perfil-head" style={{ display: 'grid', gridTemplateColumns: '150px 1fr', gap: 20 }}>
-          <Hatch ratio="1" label="[ retrato 1:1 ]" style={{ border: '1px solid rgba(var(--line-rgb), .22)' }} />
+          <Avatar src={person.avatarUrl} initials={person.initials} fill style={{ border: '1px solid rgba(var(--line-rgb), .22)' }} />
           <div>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 16, flexWrap: 'wrap' }}>
               <div>

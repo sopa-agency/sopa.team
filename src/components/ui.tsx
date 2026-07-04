@@ -100,6 +100,52 @@ export function Panel({
   )
 }
 
+/**
+ * Avatar real do membro (userbase SkateHive). Renderiza <img> quadrado no
+ * estilo do site; cai pras iniciais se não houver URL ou a imagem falhar.
+ * `size` = quadrado fixo em px; `fill` = ocupa a largura do container (ratio 1:1).
+ */
+export function Avatar({
+  src,
+  initials,
+  size = 36,
+  fill,
+  style,
+}: {
+  src?: string
+  initials: string
+  size?: number
+  fill?: boolean
+  style?: CSSProperties
+}) {
+  const [failed, setFailed] = useState(false)
+  const dims: CSSProperties = fill
+    ? { width: '100%', aspectRatio: '1' }
+    : { width: size, height: size, flex: `0 0 ${size}px` }
+  const box: CSSProperties = {
+    ...dims,
+    background: 'var(--avatar-bg)',
+    border: '1px solid rgba(var(--line-rgb), .22)',
+    ...style,
+  }
+  if (!src || failed) {
+    return (
+      <div style={{ ...box, display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--ink-strong)', fontWeight: 700, fontSize: fill ? 22 : Math.round(size * 0.31) }}>
+        {initials}
+      </div>
+    )
+  }
+  return (
+    <img
+      src={src}
+      alt={initials}
+      loading="lazy"
+      onError={() => setFailed(true)}
+      style={{ ...box, objectFit: 'cover', display: 'block' }}
+    />
+  )
+}
+
 /** hatched image placeholder */
 export function Hatch({
   ratio,

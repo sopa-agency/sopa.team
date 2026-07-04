@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { Frame, ThemeDot } from '../components/Frame'
-import { Panel, Hatch } from '../components/ui'
+import { Panel, Hatch, Avatar } from '../components/ui'
 import { FEED, FEED_SOURCES } from '../data'
 import type { FeedItem, SocialPost } from '../data'
 
@@ -18,9 +18,7 @@ function SocialCard({ p }: { p: SocialPost }) {
     <div style={{ border: '1px solid rgba(var(--accent-rgb), .13)', background: 'var(--panel)', padding: '16px 16px 14px' }}>
       <div style={{ display: 'flex', alignItems: 'flex-start', gap: 11, marginBottom: 12 }}>
         <div style={{ display: 'flex', alignItems: 'flex-start', gap: 11, flex: '1 1 auto', minWidth: 0 }}>
-          <div style={{ width: 36, height: 36, flex: '0 0 36px', background: 'var(--avatar-bg)', border: '1px solid rgba(var(--line-rgb), .22)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--ink-strong)', fontWeight: 700, fontSize: 11 }}>
-            {p.person.initials}
-          </div>
+          <Avatar src={p.person.avatarUrl} initials={p.person.initials} size={36} />
           <div style={{ minWidth: 0 }}>
             <span style={{ fontSize: 12.5, color: 'var(--ink)', fontWeight: 700 }}>{p.person.handle}</span>
             <div style={{ fontSize: 10.5, color: 'var(--muted)', marginTop: 3 }}>

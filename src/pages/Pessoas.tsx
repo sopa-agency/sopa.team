@@ -1,13 +1,15 @@
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 import { Frame, ThemeDot } from '../components/Frame'
-import { Panel, Dropdown } from '../components/ui'
-import { PEOPLE, TERRITORIES, TERRITORY_KEYS, SKILLS } from '../data'
+import { Panel, Dropdown, Avatar } from '../components/ui'
+import { PEOPLE, TERRITORIES, TERRITORY_KEYS, SKILLS, shuffle } from '../data'
 
 export function Pessoas() {
   const [territory, setTerritory] = useState<string | null>(null)
   const [skill, setSkill] = useState<string | null>(null)
+  // ordem aleatória, fixa enquanto a página está montada (não re-embaralha ao filtrar)
+  const ordered = useMemo(() => shuffle(PEOPLE), [])
 
-  const shown = PEOPLE.filter(
+  const shown = ordered.filter(
     (p) =>
       (territory == null || p.territory === territory) &&
       (skill == null || p.roles.split(' · ').includes(skill)),
@@ -111,9 +113,7 @@ export function Pessoas() {
             data-param={p.handle.slice(1)}
             style={{ display: 'grid', gridTemplateColumns: '40px 1fr 82px 22px', gap: 12, alignItems: 'center', padding: '9px 0', borderTop: '1px solid rgba(var(--line-rgb), .08)', cursor: 'pointer' }}
           >
-            <div style={{ width: 38, height: 38, background: 'var(--avatar-bg)', border: '1px solid rgba(var(--line-rgb), .22)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--ink-strong)', fontWeight: 700, fontSize: 12 }}>
-              {p.initials}
-            </div>
+            <Avatar src={p.avatarUrl} initials={p.initials} size={38} />
             <div>
               <div style={{ fontSize: 13, color: 'var(--ink)', fontWeight: 700 }}>{p.handle}</div>
               <div style={{ fontSize: 10, color: 'var(--ink-strong)', marginTop: 2, textTransform: 'uppercase' }}>{p.roles}</div>

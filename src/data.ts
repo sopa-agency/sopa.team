@@ -34,23 +34,37 @@ export type Person = {
   roles: string
   posts: number
   territory: Territory
+  /** avatar real vindo do userbase da SkateHive (Supabase). fallback → iniciais.
+   *  sincronizar com: pnpm sync:avatars (scripts/sync-avatars.mjs) */
+  avatarUrl?: string
 }
 
 export const PEOPLE: Person[] = [
-  { handle: '@bielcx', initials: 'BI', roles: 'dev · comunidade', posts: 31, territory: 'comunidade' },
-  { handle: '@xvlad', initials: 'XV', roles: 'dev · ai · web3', posts: 24, territory: 'estratégia / produto' },
-  { handle: '@willdias', initials: 'WI', roles: 'criativo', posts: 18, territory: 'design / motion' },
-  { handle: '@vaipraonde', initials: 'VA', roles: 'dev · web3', posts: 27, territory: 'dev / web3' },
-  { handle: '@mengao', initials: 'ME', roles: 'dev · web3', posts: 12, territory: 'dev / web3' },
-  { handle: '@r4topunk', initials: 'R4', roles: 'dev · web3 · criativo', posts: 22, territory: 'design / motion' },
-  { handle: '@joaoparmagnani', initials: 'JO', roles: 'social media', posts: 9, territory: 'social / conteúdo' },
-  { handle: '@humbertoperes', initials: 'HU', roles: 'skate · comunidade', posts: 15, territory: 'comunidade' },
-  { handle: '@louzoshi', initials: 'LO', roles: 'dev · comunidade', posts: 33, territory: 'comunidade' },
-  { handle: '@nogenta', initials: 'NO', roles: 'photo · film', posts: 14, territory: 'vídeo' },
+  { handle: '@bielcx', initials: 'BI', roles: 'dev · comunidade', posts: 31, territory: 'comunidade', avatarUrl: 'https://ipfs.skatehive.app/ipfs/bafkreien7mljpj3erknn4mc6agtgsprovtl3dvyg4okp32mqqbjedghjii?filename=skatehive.png' },
+  { handle: '@xvlad', initials: 'XV', roles: 'dev · ai · web3', posts: 24, territory: 'estratégia / produto', avatarUrl: 'https://images.hive.blog/u/xvlad/avatar' },
+  { handle: '@willdias', initials: 'WI', roles: 'criativo', posts: 18, territory: 'design / motion', avatarUrl: 'https://images.hive.blog/u/willdias/avatar' },
+  { handle: '@vaipraonde', initials: 'VA', roles: 'dev · web3', posts: 27, territory: 'dev / web3', avatarUrl: 'https://imagedelivery.net/BXluQx4ige9GuW0Ia56BHw/8fa98f2b-fd39-4a33-94ad-0bd3084f6d00/original' },
+  { handle: '@mengao', initials: 'ME', roles: 'dev · web3', posts: 12, territory: 'dev / web3', avatarUrl: 'https://images.hive.blog/u/mengao/avatar' },
+  { handle: '@r4topunk', initials: 'R4', roles: 'dev · web3 · criativo', posts: 22, territory: 'design / motion', avatarUrl: 'https://images.hive.blog/u/r4topunk/avatar' },
+  { handle: '@joaoparmagnani', initials: 'JO', roles: 'social media', posts: 9, territory: 'social / conteúdo', avatarUrl: 'https://images.hive.blog/u/joaoparmagnani/avatar' },
+  { handle: '@humbertoperes', initials: 'HU', roles: 'skate · comunidade', posts: 15, territory: 'comunidade', avatarUrl: 'https://imagedelivery.net/BXluQx4ige9GuW0Ia56BHw/97fe9ce5-4047-4492-b66c-c9eb99197d00/original' },
+  { handle: '@louzoshi', initials: 'LO', roles: 'dev · comunidade', posts: 33, territory: 'comunidade', avatarUrl: 'https://ipfs.skatehive.app/ipfs/bafkreieacx3evdxkmmxkehz7z7btjeto7ijaiavpfyg6dwenevql2mm2be?filename=skatehive.png' },
+  { handle: '@nogenta', initials: 'NO', roles: 'photo · film', posts: 14, territory: 'vídeo', avatarUrl: 'https://images.hive.blog/u/nogenta/avatar' },
 ]
 
 /* Home "pessoas" preview cards */
 export const HOME_PEOPLE = PEOPLE.slice(0, 4)
+
+/** Fisher-Yates — retorna uma nova ordem a cada chamada, sem mutar o original.
+ *  Use com useMemo([]) pra embaralhar uma vez por montagem (não a cada render). */
+export function shuffle<T>(arr: readonly T[]): T[] {
+  const a = [...arr]
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1))
+    ;[a[i], a[j]] = [a[j], a[i]]
+  }
+  return a
+}
 
 /* unique skill tokens across everyone's roles — feeds the /pessoas skill filter */
 export const SKILLS: string[] = [...new Set(PEOPLE.flatMap((p) => p.roles.split(' · ')))]

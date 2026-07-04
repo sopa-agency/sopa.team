@@ -1,10 +1,13 @@
+import { useMemo } from 'react'
 import { Frame, navigate, ThemeDot } from '../components/Frame'
-import { Hatch } from '../components/ui'
-import { HOME_PEOPLE, HOME_FEED, HOME_PROJECTS, CAPABILITIES_SHORT } from '../data'
+import { Hatch, Avatar } from '../components/ui'
+import { PEOPLE, HOME_FEED, HOME_PROJECTS, CAPABILITIES_SHORT, shuffle } from '../data'
 
 const section: React.CSSProperties = { borderBottom: '1px solid rgba(var(--line-rgb), .16)' }
 
 export function Home() {
+  // ordem aleatória das pessoas, fixa por montagem
+  const people = useMemo(() => shuffle(PEOPLE), [])
   return (
     <Frame
       active="home"
@@ -61,25 +64,24 @@ export function Home() {
             ver diretório →
           </a>
         </div>
-        <div className="grid-people">
-          {HOME_PEOPLE.map((p) => (
-            <div key={p.handle} data-person data-route="perfil" data-param={p.handle.slice(1)} style={{ border: '1px solid var(--line)', background: 'var(--panel)', cursor: 'pointer' }}>
-              <Hatch ratio="1" label="[ avatar 1:1 ]" style={{ borderBottom: '1px solid rgba(var(--line-rgb), .12)', border: 'none' }} />
-              <div style={{ padding: '13px 13px 15px' }}>
-                <div className="display" style={{ fontWeight: 800, fontSize: 17, color: 'var(--ink)', lineHeight: 1.05 }}>
-                  {p.handle}
-                </div>
-                <div style={{ fontSize: 11, color: 'var(--ink-strong)', marginTop: 5, textTransform: 'uppercase', letterSpacing: '.06em' }}>
-                  {p.roles}
-                </div>
-                <div style={{ display: 'flex', flexWrap: 'wrap', gap: 5, marginTop: 11 }}>
-                  {p.roles.split(' · ').map((t) => (
-                    <span key={t} className="tag-sm" style={{ color: 'var(--body)' }}>
-                      {t}
-                    </span>
-                  ))}
-                </div>
+        <div className="pessoas-dir">
+          {people.map((p) => (
+            <div
+              key={p.handle}
+              data-person
+              data-route="perfil"
+              data-param={p.handle.slice(1)}
+              style={{ display: 'grid', gridTemplateColumns: '30px 1fr auto 16px', gap: 11, alignItems: 'center', padding: '8px 0', borderTop: '1px solid var(--line-soft)', cursor: 'pointer' }}
+            >
+              <Avatar src={p.avatarUrl} initials={p.initials} size={30} />
+              <div style={{ minWidth: 0, display: 'flex', flexDirection: 'column' }}>
+                <span style={{ fontSize: 12, fontWeight: 700, color: 'var(--ink)' }}>{p.handle}</span>
+                <span style={{ fontSize: 9.5, color: 'var(--ink-strong)', textTransform: 'uppercase', letterSpacing: '.04em', marginTop: 1 }}>{p.roles}</span>
               </div>
+              <span style={{ fontSize: 10.5, color: 'var(--body)', whiteSpace: 'nowrap', fontVariantNumeric: 'tabular-nums' }}>
+                {p.posts} <span style={{ color: 'var(--faint)' }}>posts</span>
+              </span>
+              <span style={{ fontSize: 12, color: 'var(--ink-strong)', textAlign: 'right' }}>→</span>
             </div>
           ))}
         </div>

@@ -504,6 +504,12 @@ a {
   grid-template-columns: repeat(4, 1fr);
   gap: 14px;
 }
+/* home pessoas preview — diretório denso em 2 colunas (proposta 03) */
+.pessoas-dir {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  column-gap: 34px;
+}
 .grid-2 {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -528,7 +534,8 @@ a {
   .grid-people,
   .grid-2,
   .split-2,
-  .cap-grid {
+  .cap-grid,
+  .pessoas-dir {
     grid-template-columns: 1fr !important;
   }
   .split-2 > div:first-child {
