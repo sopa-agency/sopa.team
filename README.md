@@ -12,18 +12,31 @@ pnpm install
 pnpm dev       # http://localhost:5173
 pnpm build     # tsc -b + vite build → dist/
 pnpm preview   # serve o dist/
+pnpm sync:people   # puxa o cadastro de pessoas do marketing-portal
+pnpm sync:avatars  # confere os avatares contra o userbase (Supabase)
 ```
 
-## Rotas (hash router)
+`VITE_SOPA_API` aponta o formulário de contato pro portal (default
+`https://sopa.reelflip.com/api/sopa`). Contra um portal local:
+`VITE_SOPA_API=http://localhost:3000/api/sopa pnpm dev`.
 
-`#/home` · `#/pessoas` · `#/perfil/<handle>` · `#/feed` · `#/projetos` · `#/capacidades` · `#/contato` · `#/post`
+## Rotas
+
+No ar: `/` · `/pessoas` · `/perfil/<handle>` · `/contato` — a lista é `PUBLISHED_ROUTES` em `data.ts`.
+
+`/feed`, `/projetos`, `/capacidades` e `/post` seguem no repo (páginas + conteúdo de exemplo), mas
+estão **fora do router**: dependem de dados que ainda não existem no portal, então a URL cai na home
+em vez de servir mock. Para religar, basta devolvê-las a `PUBLISHED_ROUTES` — ver
+`docs/cadastro-pessoas.md`.
 
 ## Estrutura
 
 ```
 src/
   index.css            tokens por tema + estilos de shell/painel/grids responsivos
-  data.ts              conteúdo (pessoas, feed, projetos, capacidades) — fonte única; facetas derivadas
+  data.ts              conteúdo (feed, projetos, capacidades) + junção do diretório; facetas derivadas
+  people.generated.ts  GERADO (pnpm sync:people) — bio + skills + roster vindos do portal
+  people-overrides.ts  camada curatorial do diretório + gate de quem aparece
   router.ts            hash router mínimo (useSyncExternalStore) + delegação [data-route]
   theme.ts             store de tema (useSyncExternalStore) + localStorage + data-theme no <html>
   App.tsx              switch de rota
@@ -46,6 +59,30 @@ pra não virar texto-sobre-accent invisível nos temas escuros. Fontes: **Archiv
 - **feed** — filtra por fonte (farcaster/x/instagram/hive)
 - **projetos** — dropdowns pessoa/tipo/ano + sort (recentes/antigos/a–z), chips ✕, rail clicável; facetas e contagens derivadas de `PROJECTS`
 - **pessoas** — dropdowns território/skill + rail de territórios clicável; facetas derivadas de `PEOPLE`
+
+## Cadastro de pessoas (marketing-portal)
+
+O diretório é **cadastro do portal ⋈ curadoria local**:
+
+| lado | onde | o quê |
+|---|---|---|
+| portal (fonte de verdade) | `src/people.generated.ts` | roster, `bio`, `skills` (scores 0–100 de `MemberSkills`), avatar padrão |
+| curadoria | `src/people-overrides.ts` | `territory`, `roles`, `posts`, `initials`, avatar do userbase, **ordem** |
+
+`pnpm sync:people` busca `GET /api/sopa/site-data` no portal e reescreve o arquivo gerado — que é
+**commitado**, então o build nunca depende da rede. Quem está na allowlist do portal mas não tem
+entrada em `people-overrides.ts` fica fora do site (é assim que as contas de marca — `reelflip`,
+`keepkey`, `illithics` — são excluídas); o script avisa quem ficou de fora.
+
+```sh
+pnpm sync:people                                  # produção
+SOPA_SITE_DATA_URL=http://localhost:3000/api/sopa/site-data pnpm sync:people
+node scripts/sync-people.mjs --from snapshot.json  # ingere um dump do payload
+```
+
+O mesmo endpoint também devolve `projects`, `capabilities` e `feed`, mas hoje esses boards do portal
+não servem ao site (portfólio = lista de portais sem metadados, capacidades vazio, feed só da conta
+`@skatehive`). Continuam curatoriais aqui em `data.ts`.
 
 ## Notas
 

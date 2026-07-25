@@ -1,54 +1,34 @@
 import { Frame, ThemeDot } from '../components/Frame'
-import { Panel, Hatch, KeyVals, Avatar } from '../components/ui'
+import { Panel, Avatar } from '../components/ui'
 import { PEOPLE } from '../data'
+import { SKILL_LABELS } from '../people-overrides'
 
-const LINKS = ['site ↗', 'instagram ↗', 'are.na ↗', 'behance ↗']
-const SERVICES = ['identidade visual', 'sistema de design', 'direção de arte', 'motion básico', 'layout figma → web']
-const POSTS = [
-  { tag: 'making-of', title: 'Identidade viva pra rave XYZ', date: '28.06', video: false },
-  { tag: 'nota de processo', title: 'Sistema tipográfico do Festival Maré', date: '12.06', video: false },
-  { tag: '▶ vídeo', title: 'Timelapse do lettering (0:48)', date: '20.05', video: true },
-]
-const OWN = [
-  ['Festival Maré', 'site + identidade · 2025'],
-  ['Fanzine #03', 'editorial · 2024'],
-  ['Identidade — coletivo de skate', 'identidade · 2024'],
-]
-const COLLABS = [
-  ['RSVP on-chain', '@willdias @joaoparmagnani'],
-  ['Drop de inverno', '@r4topunk @vaipraonde'],
-  ['Doc da line-up', '@vaipraonde'],
-]
+/** barra TUI de 24 células — preenchida + apagada */
+const BAR = '█'.repeat(24)
+const DIM = '·'.repeat(24)
+
+const DEFAULT_HANDLE = '@xvlad'
+
+/* O perfil mostra só o que a pessoa preencheu no portal (bio + skills) e o que
+ * é curadoria nossa (roles, território). Links, serviços, projetos, posts e
+ * mídia saíram junto com o mock — voltam quando existirem como cadastro de
+ * verdade. Ver docs/cadastro-pessoas.md. */
 
 export function Perfil({ handle }: { handle?: string }) {
-  const person = PEOPLE.find((p) => p.handle.slice(1) === handle) ?? PEOPLE[1] // default @xvlad
+  const person =
+    PEOPLE.find((p) => p.handle.slice(1) === handle) ??
+    PEOPLE.find((p) => p.handle === DEFAULT_HANDLE) ??
+    PEOPLE[0]
   const slug = person.handle.slice(1)
-  // the one written post belongs to @xvlad; only its row opens the post page
-  const isVlad = person.handle === '@xvlad'
+  // já vem ordenado desc e sem zeros do gerador; só cortamos a cauda
+  const skills = Object.entries(person.skills).slice(0, 6)
 
   const rail = (
     <>
-      <Panel tag="[ sobre ]" tight>
-        <KeyVals rows={[
-          ['desde', 2021],
-          ['base', 'São Paulo'],
-          ['idiomas', 'PT · EN'],
-          ['foco', person.roles.split(' · ')[0]],
-        ]} />
-      </Panel>
-      <Panel tag="[ números ]" tight>
-        <div style={{ display: 'flex', justifyContent: 'space-between', textAlign: 'center' }}>
-          {[[person.posts, 'posts'], [8, 'projetos'], [5, 'colabs']].map(([n, l]) => (
-            <div key={l}>
-              <div className="display" style={{ fontWeight: 800, fontSize: 22, color: 'var(--ink)' }}>{n}</div>
-              <div style={{ fontSize: 9, color: 'var(--faint)' }}>{l}</div>
-            </div>
-          ))}
-        </div>
-      </Panel>
-      <Panel tag="[ no radar ]" tight>
-        <div style={{ fontSize: 11, lineHeight: 1.7, color: 'var(--muted)' }}>
-          tipos variáveis · risografia · sistemas de cor pra eventos
+      <Panel tag="[ território ]" tight>
+        <div style={{ fontSize: 12, color: 'var(--ink)' }}>{person.territory}</div>
+        <div data-route="pessoas" style={{ fontSize: 10.5, color: 'var(--faint)', marginTop: 10, cursor: 'pointer' }}>
+          ver quem mais atua aqui →
         </div>
       </Panel>
     </>
@@ -63,7 +43,7 @@ export function Perfil({ handle }: { handle?: string }) {
       footerLabel={`sopa://pessoas/${slug}`}
       footerMeta={
         <>
-          <span>{person.posts} posts</span>
+          <span>{person.territory}</span>
           <span>PT/EN</span>
           <ThemeDot />
         </>
@@ -87,16 +67,11 @@ export function Perfil({ handle }: { handle?: string }) {
                 <div data-route="contato" className="btn-yellow" style={{ fontSize: 12, padding: '8px 14px', marginTop: 8, cursor: 'pointer' }}>chamar pra projeto →</div>
               </div>
             </div>
-            <p style={{ fontSize: 12.5, lineHeight: 1.65, color: 'var(--body)', margin: '14px 0 0', maxWidth: '60ch' }}>
-              Designer gráfica focada em identidade viva pra cultura e música. Gosto de sistemas que respiram —
-              tipografia, grid e movimento como uma coisa só. Baseada em SP.
+            {/* bio vem do cadastro no portal; sem bio, o perfil não inventa uma */}
+            <p style={{ fontSize: 12.5, lineHeight: 1.65, color: person.bio ? 'var(--body)' : 'var(--faint)', margin: '14px 0 0', maxWidth: '60ch' }}>
+              {person.bio ?? 'Sem bio ainda — essa pessoa ainda não preencheu o cadastro.'}
             </p>
             <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6, marginTop: 14 }}>
-              {LINKS.map((l) => (
-                <span key={l} style={{ fontSize: 10.5, border: '1px solid var(--line-strong)', padding: '3px 8px', color: 'var(--muted)' }}>{l}</span>
-              ))}
-            </div>
-            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6, marginTop: 10 }}>
               {person.roles.split(' · ').map((t) => (
                 <span key={t} style={{ fontSize: 10, background: 'rgba(var(--accent-rgb), .12)', color: 'var(--ink-strong)', padding: '3px 8px' }}>{t}</span>
               ))}
@@ -105,75 +80,23 @@ export function Perfil({ handle }: { handle?: string }) {
         </div>
       </Panel>
 
-      {/* serviços */}
-      <Panel tag="[ serviços que assumo ]">
-        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
-          {SERVICES.map((s) => (
-            <span key={s} style={{ fontSize: 12, border: '1px solid rgba(var(--line-rgb), .22)', color: 'var(--ink)', padding: '7px 12px' }}>{s}</span>
-          ))}
-        </div>
-      </Panel>
-
-      {/* posts */}
-      <Panel tag={`[ posts — ${person.posts} ]`}>
-        {POSTS.map((p) => {
-          const live = isVlad && p.tag === 'making-of'
-          return (
-            <div
-              key={p.title}
-              {...(live ? { 'data-route': 'post' } : {})}
-              style={{ display: 'grid', gridTemplateColumns: '64px 1fr auto', gap: 14, alignItems: 'center', padding: '9px 0', borderTop: '1px solid rgba(var(--line-rgb), .09)', cursor: live ? 'pointer' : 'default' }}
-            >
-              <div className={p.video ? 'ph' : ''} style={{ width: 64, height: 42, background: p.video ? 'var(--panel-alt)' : 'var(--hatch)', border: '1px solid var(--line-soft)', color: 'var(--faint)', fontSize: 14 }}>
-                {p.video ? '▶' : ''}
-              </div>
-              <div>
-                <div style={{ fontSize: 10, color: 'var(--ink-strong)', textTransform: 'uppercase' }}>{p.tag}</div>
-                <div className="display" style={{ fontWeight: 600, fontSize: 15, color: 'var(--ink)', marginTop: 2 }}>{p.title}</div>
-              </div>
-              <div style={{ fontSize: 10.5, color: 'var(--faint)', textAlign: 'right' }}>{live ? `${p.date} →` : p.date}</div>
-            </div>
-          )
-        })}
-        <div data-route="feed" style={{ fontSize: 10.5, color: 'var(--faint)', padding: '10px 0 2px', borderTop: '1px solid rgba(var(--line-rgb), .09)', cursor: 'pointer' }}>
-          ver todos os {person.posts} posts →
-        </div>
-      </Panel>
-
-      {/* projetos + colabs */}
-      <div className="grid-2" style={{ gap: 16, marginTop: 16 }}>
-        <Panel tag="[ projetos próprios ]" tight style={{ padding: '20px 14px 13px' }}>
-          {OWN.map(([n, m]) => (
-            <div key={n} style={{ padding: '8px 0', borderTop: '1px solid rgba(var(--line-rgb), .09)' }}>
-              <span style={{ fontSize: 13, color: 'var(--ink)', fontWeight: 700 }}>{n}</span>
-              <div style={{ fontSize: 10, color: 'var(--faint)', marginTop: 3 }}>{m}</div>
+      {/* skills — scores do cadastro no portal (MemberSkills), top 6 */}
+      {skills.length > 0 && (
+        <Panel tag="[ skills ]">
+          {skills.map(([key, score]) => (
+            <div key={key} style={{ display: 'grid', gridTemplateColumns: '124px 1fr 34px', gap: 12, alignItems: 'center', padding: '5px 0' }}>
+              <span style={{ fontSize: 11.5, color: 'var(--ink)' }}>{SKILL_LABELS[key] ?? key}</span>
+              <span style={{ fontSize: 11, letterSpacing: '.5px', color: 'var(--ink-strong)', overflow: 'hidden', whiteSpace: 'nowrap' }}>
+                {BAR.slice(0, Math.max(1, Math.round((score / 100) * BAR.length)))}
+                <span style={{ color: 'var(--faint)' }}>
+                  {DIM.slice(0, BAR.length - Math.max(1, Math.round((score / 100) * BAR.length)))}
+                </span>
+              </span>
+              <span style={{ fontSize: 10.5, color: 'var(--faint)', textAlign: 'right' }}>{score}</span>
             </div>
           ))}
         </Panel>
-        <Panel tag="[ colaborações ]" tight style={{ padding: '20px 14px 13px' }}>
-          {COLLABS.map(([n, w]) => (
-            <div key={n} style={{ padding: '8px 0', borderTop: '1px solid rgba(var(--line-rgb), .09)' }}>
-              <div style={{ fontSize: 13, color: 'var(--ink)', fontWeight: 700 }}>{n}</div>
-              <div style={{ fontSize: 10, color: 'var(--muted)', marginTop: 3 }}>
-                com <span style={{ color: 'var(--ink-strong)' }}>{w}</span>
-              </div>
-            </div>
-          ))}
-        </Panel>
-      </div>
-
-      {/* mídia */}
-      <Panel tag="[ mídia ]">
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: 10 }}>
-          {[0, 1, 2, 3].map((i) =>
-            i === 1 ? (
-              <div key={i} className="ph" style={{ aspectRatio: 1, background: 'var(--panel-alt)', border: '1px solid var(--line-soft)', color: 'var(--faint)', fontSize: 15 }}>▶</div>
-            ) : (
-              <Hatch key={i} ratio="1" label="[ img ]" />
-            ),
-          )}
-        </div>
-      </Panel>
+      )}
     </Frame>
   )
 }

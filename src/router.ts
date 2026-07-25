@@ -1,7 +1,7 @@
 import { useSyncExternalStore, useCallback } from 'react'
-import type { Route } from './data'
+import { PUBLISHED_ROUTES, type Route } from './data'
 
-const VALID: Route[] = ['home', 'pessoas', 'perfil', 'feed', 'projetos', 'capacidades', 'contato', 'post']
+const VALID: Route[] = PUBLISHED_ROUTES
 
 export type Location = { route: Route; param?: string }
 

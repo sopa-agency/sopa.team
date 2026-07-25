@@ -1,5 +1,5 @@
 import type { ReactNode } from 'react'
-import { NAV } from '../data'
+import { NAV, PEOPLE } from '../data'
 import type { Route } from '../data'
 import { navigate, useRouteDelegate, href } from '../router'
 import { useTheme, cycleTheme, themeLabel } from '../theme'
@@ -122,7 +122,7 @@ export function Frame({
     active === 'home' ? (
       <>
         <span>
-          <span className="on">●</span> 10 online
+          <span className="on">●</span> {PEOPLE.length} no coletivo
         </span>
         <span>PT/EN</span>
         <span>◐</span>

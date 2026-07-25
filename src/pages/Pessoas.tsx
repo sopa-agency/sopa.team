@@ -98,10 +98,10 @@ export function Pessoas() {
           </div>
         </div>
 
-        <div style={{ display: 'grid', gridTemplateColumns: '40px 1fr 82px 22px', gap: 12, fontSize: 10, color: 'var(--faint)', textTransform: 'uppercase', padding: '0 0 8px', borderBottom: '1px solid rgba(var(--line-rgb), .14)' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: '40px 1fr 120px 22px', gap: 12, fontSize: 10, color: 'var(--faint)', textTransform: 'uppercase', padding: '0 0 8px', borderBottom: '1px solid rgba(var(--line-rgb), .14)' }}>
           <span />
           <span>nome</span>
-          <span>posts</span>
+          <span>território</span>
           <span />
         </div>
 
@@ -111,16 +111,14 @@ export function Pessoas() {
             data-person
             data-route="perfil"
             data-param={p.handle.slice(1)}
-            style={{ display: 'grid', gridTemplateColumns: '40px 1fr 82px 22px', gap: 12, alignItems: 'center', padding: '9px 0', borderTop: '1px solid rgba(var(--line-rgb), .08)', cursor: 'pointer' }}
+            style={{ display: 'grid', gridTemplateColumns: '40px 1fr 120px 22px', gap: 12, alignItems: 'center', padding: '9px 0', borderTop: '1px solid rgba(var(--line-rgb), .08)', cursor: 'pointer' }}
           >
             <Avatar src={p.avatarUrl} initials={p.initials} size={38} />
             <div>
               <div style={{ fontSize: 13, color: 'var(--ink)', fontWeight: 700 }}>{p.handle}</div>
               <div style={{ fontSize: 10, color: 'var(--ink-strong)', marginTop: 2, textTransform: 'uppercase' }}>{p.roles}</div>
             </div>
-            <div style={{ fontSize: 11, color: 'var(--body)' }}>
-              {p.posts} <span style={{ color: 'var(--faint)' }}>posts</span>
-            </div>
+            <div style={{ fontSize: 11, color: 'var(--muted)' }}>{p.territory}</div>
             <div style={{ fontSize: 12, color: 'var(--ink-strong)', textAlign: 'right' }}>→</div>
           </div>
         ))}
