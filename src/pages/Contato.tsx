@@ -6,22 +6,25 @@ const TYPES = ['presença digital', 'site / landing', 'identidade', 'campanha', 
 const BUDGET = ['até 5k', '5–15k', '15–40k', '40k+', 'a definir']
 const DEADLINE = ['sem pressa', '1 mês', 'este trimestre', 'ontem']
 
-function Toggle({ items, initial }: { items: string[]; initial: number[] }) {
-  const [sel, setSel] = useState<Set<number>>(new Set(initial))
+/** Endpoint do brief no marketing-portal. Sobrescrevível por VITE_SOPA_API pra
+ *  apontar num portal local durante o desenvolvimento. */
+const BRIEF_URL =
+  (import.meta.env.VITE_SOPA_API as string | undefined)?.replace(/\/$/, '') ??
+  'https://sopa.reelflip.com/api/sopa'
+
+function Toggle({ items, value, onChange }: { items: string[]; value: Set<string>; onChange: (v: Set<string>) => void }) {
   return (
     <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
-      {items.map((t, i) => {
-        const on = sel.has(i)
+      {items.map((t) => {
+        const on = value.has(t)
         return (
           <span
             key={t}
-            onClick={() =>
-              setSel((prev) => {
-                const next = new Set(prev)
-                next.has(i) ? next.delete(i) : next.add(i)
-                return next
-              })
-            }
+            onClick={() => {
+              const next = new Set(value)
+              next.has(t) ? next.delete(t) : next.add(t)
+              onChange(next)
+            }}
             className={'pill' + (on ? ' on' : '')}
             style={{ fontSize: 11.5, padding: '5px 11px', cursor: 'pointer', color: on ? undefined : 'var(--ink)' }}
           >
@@ -33,16 +36,15 @@ function Toggle({ items, initial }: { items: string[]; initial: number[] }) {
   )
 }
 
-function Single({ items, initial }: { items: string[]; initial: number }) {
-  const [sel, setSel] = useState(initial)
+function Single({ items, value, onChange }: { items: string[]; value: string; onChange: (v: string) => void }) {
   return (
     <div style={{ display: 'flex', flexWrap: 'wrap', gap: 7 }}>
-      {items.map((t, i) => (
+      {items.map((t) => (
         <span
           key={t}
-          onClick={() => setSel(i)}
-          className={'pill' + (sel === i ? ' on' : '')}
-          style={{ fontSize: 11.5, padding: '5px 11px', cursor: 'pointer', color: sel === i ? undefined : 'var(--ink)' }}
+          onClick={() => onChange(t)}
+          className={'pill' + (value === t ? ' on' : '')}
+          style={{ fontSize: 11.5, padding: '5px 11px', cursor: 'pointer', color: value === t ? undefined : 'var(--ink)' }}
         >
           {t}
         </span>
@@ -51,15 +53,49 @@ function Single({ items, initial }: { items: string[]; initial: number }) {
   )
 }
 
+type Status = { kind: 'idle' | 'sending' | 'sent' } | { kind: 'error'; message: string }
+
 export function Contato() {
+  const [name, setName] = useState('')
+  const [contact, setContact] = useState('')
+  const [types, setTypes] = useState<Set<string>>(new Set([TYPES[0]]))
+  const [budget, setBudget] = useState(BUDGET[4])
+  const [deadline, setDeadline] = useState(DEADLINE[2])
+  const [message, setMessage] = useState('')
+  const [honeypot, setHoneypot] = useState('') // bots preenchem, gente não vê
+  const [status, setStatus] = useState<Status>({ kind: 'idle' })
+
+  async function submit() {
+    if (status.kind === 'sending') return
+    if (!name.trim() || !contact.trim() || message.trim().length < 10) {
+      setStatus({ kind: 'error', message: 'Preencha nome, contato e conta um pouco mais (10+ caracteres).' })
+      return
+    }
+    setStatus({ kind: 'sending' })
+    try {
+      const res = await fetch(`${BRIEF_URL}/brief`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name, contact, message, budget, deadline,
+          types: [...types],
+          website: honeypot,
+        }),
+      })
+      const data = (await res.json().catch(() => null)) as { ok?: boolean; error?: string } | null
+      if (!res.ok || !data?.ok) throw new Error(data?.error ?? `Erro ${res.status}`)
+      setStatus({ kind: 'sent' })
+    } catch (err) {
+      setStatus({ kind: 'error', message: err instanceof Error ? err.message : 'Falha ao enviar.' })
+    }
+  }
+
   const rail = (
     <>
       <Panel tag="[ canais ]" tight>
         <div style={{ display: 'flex', flexDirection: 'column', gap: 11, fontSize: 12 }}>
           {[
-            ['email', 'oi@sopa.studio'],
-            ['insta', '@sopa.studio'],
-            ['discord', 'sopa.studio/dc'],
+            ['brief', 'este formulário'],
             ['base', 'SP · remoto'],
           ].map(([k, v]) => (
             <div key={k} style={{ display: 'flex', justifyContent: 'space-between', gap: 10 }}>
@@ -141,29 +177,39 @@ export function Contato() {
             <div className="grid-2" style={{ gap: 18 }}>
               <label style={{ display: 'block' }}>
                 <div style={{ fontSize: 11, color: 'var(--muted)', marginBottom: 7 }}>nome / coletivo</div>
-                <input className="field" placeholder="quem tá chamando" />
+                <input className="field" placeholder="quem tá chamando" value={name} onChange={(e) => setName(e.target.value)} />
               </label>
               <label style={{ display: 'block' }}>
                 <div style={{ fontSize: 11, color: 'var(--muted)', marginBottom: 7 }}>email / @</div>
-                <input className="field" placeholder="pra gente responder" />
+                <input className="field" placeholder="pra gente responder" value={contact} onChange={(e) => setContact(e.target.value)} />
               </label>
             </div>
+
+            {/* honeypot — fora da tela, invisível pra quem usa o site */}
+            <input
+              tabIndex={-1}
+              autoComplete="off"
+              aria-hidden="true"
+              value={honeypot}
+              onChange={(e) => setHoneypot(e.target.value)}
+              style={{ position: 'absolute', left: '-9999px', width: 1, height: 1, opacity: 0 }}
+            />
 
             <div style={{ marginTop: 20 }}>
               <div style={{ fontSize: 11, color: 'var(--muted)', marginBottom: 9 }}>
                 o que é <span style={{ color: 'var(--faint)' }}>— pode marcar mais de um</span>
               </div>
-              <Toggle items={TYPES} initial={[0]} />
+              <Toggle items={TYPES} value={types} onChange={setTypes} />
             </div>
 
             <div className="grid-2" style={{ gap: 22, marginTop: 20 }}>
               <div>
                 <div style={{ fontSize: 11, color: 'var(--muted)', marginBottom: 9 }}>orçamento</div>
-                <Single items={BUDGET} initial={4} />
+                <Single items={BUDGET} value={budget} onChange={setBudget} />
               </div>
               <div>
                 <div style={{ fontSize: 11, color: 'var(--muted)', marginBottom: 9 }}>prazo</div>
-                <Single items={DEADLINE} initial={2} />
+                <Single items={DEADLINE} value={deadline} onChange={setDeadline} />
               </div>
             </div>
 
@@ -176,16 +222,27 @@ export function Contato() {
                   rows={4}
                   placeholder="o projeto, a vibe, referências, links do que já existe..."
                   style={{ paddingLeft: 28, resize: 'vertical', lineHeight: 1.6 }}
+                  value={message}
+                  onChange={(e) => setMessage(e.target.value)}
                 />
               </div>
             </div>
 
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: 22, flexWrap: 'wrap', gap: 12 }}>
-              <div style={{ fontSize: 11, color: 'var(--faint)' }}>
-                ou manda direto pra <span style={{ color: 'var(--body)' }}>oi@sopa.studio</span>
+              <div style={{ fontSize: 11, color: status.kind === 'error' ? 'var(--ink-strong)' : 'var(--faint)' }}>
+                {status.kind === 'error'
+                  ? `⚠ ${status.message}`
+                  : status.kind === 'sent'
+                    ? '● brief recebido — a gente responde em até 2 dias úteis.'
+                    : 'a gente lê o brief inteiro antes de responder.'}
               </div>
-              <button className="btn-yellow" style={{ fontSize: 13, padding: '11px 22px' }}>
-                enviar brief →
+              <button
+                className="btn-yellow"
+                style={{ fontSize: 13, padding: '11px 22px', opacity: status.kind === 'sending' || status.kind === 'sent' ? 0.6 : 1 }}
+                disabled={status.kind === 'sending' || status.kind === 'sent'}
+                onClick={submit}
+              >
+                {status.kind === 'sending' ? 'enviando…' : status.kind === 'sent' ? 'enviado ✓' : 'enviar brief →'}
               </button>
             </div>
           </Panel>
