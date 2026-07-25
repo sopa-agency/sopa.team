@@ -1,3 +1,6 @@
+import { REMOTE_PEOPLE, GENERATED_AT } from './people.generated'
+import { PEOPLE_OVERRIDES } from './people-overrides'
+
 export type Route =
   | 'home'
   | 'pessoas'
@@ -7,15 +10,6 @@ export type Route =
   | 'capacidades'
   | 'contato'
   | 'post'
-
-export const NAV: { route: Route; label: string; count?: string }[] = [
-  { route: 'home', label: 'home' },
-  { route: 'pessoas', label: 'pessoas', count: '(10)' },
-  { route: 'feed', label: 'feed', count: '(142)' },
-  { route: 'projetos', label: 'projetos', count: '(38)' },
-  { route: 'capacidades', label: 'capacidades', count: '(06)' },
-  { route: 'contato', label: 'contato' },
-]
 
 /* curatorial grouping above raw skills; drives the /pessoas território filter */
 export const TERRITORY_KEYS = [
@@ -32,24 +26,50 @@ export type Person = {
   handle: string
   initials: string
   roles: string
-  posts: number
   territory: Territory
-  /** avatar real vindo do userbase da SkateHive (Supabase). fallback → iniciais.
-   *  sincronizar com: pnpm sync:avatars (scripts/sync-avatars.mjs) */
+  /** avatar real (userbase da SkateHive ou padrão do Hive). fallback → iniciais */
   avatarUrl?: string
+  /** bio escrita pela pessoa no portal; null quando ainda não preencheu */
+  bio: string | null
+  /** skill → score 0–100 (MemberSkills no portal), já ordenado desc e sem zeros */
+  skills: Record<string, number>
 }
 
-export const PEOPLE: Person[] = [
-  { handle: '@bielcx', initials: 'BI', roles: 'dev · comunidade', posts: 31, territory: 'comunidade', avatarUrl: 'https://ipfs.skatehive.app/ipfs/bafkreien7mljpj3erknn4mc6agtgsprovtl3dvyg4okp32mqqbjedghjii?filename=skatehive.png' },
-  { handle: '@xvlad', initials: 'XV', roles: 'dev · ai · web3', posts: 24, territory: 'estratégia / produto', avatarUrl: 'https://images.hive.blog/u/xvlad/avatar' },
-  { handle: '@willdias', initials: 'WI', roles: 'criativo', posts: 18, territory: 'design / motion', avatarUrl: 'https://images.hive.blog/u/willdias/avatar' },
-  { handle: '@vaipraonde', initials: 'VA', roles: 'dev · web3', posts: 27, territory: 'dev / web3', avatarUrl: 'https://imagedelivery.net/BXluQx4ige9GuW0Ia56BHw/8fa98f2b-fd39-4a33-94ad-0bd3084f6d00/original' },
-  { handle: '@mengao', initials: 'ME', roles: 'dev · web3', posts: 12, territory: 'dev / web3', avatarUrl: 'https://images.hive.blog/u/mengao/avatar' },
-  { handle: '@r4topunk', initials: 'R4', roles: 'dev · web3 · criativo', posts: 22, territory: 'design / motion', avatarUrl: 'https://images.hive.blog/u/r4topunk/avatar' },
-  { handle: '@joaoparmagnani', initials: 'JO', roles: 'social media', posts: 9, territory: 'social / conteúdo', avatarUrl: 'https://images.hive.blog/u/joaoparmagnani/avatar' },
-  { handle: '@humbertoperes', initials: 'HU', roles: 'skate · comunidade', posts: 15, territory: 'comunidade', avatarUrl: 'https://imagedelivery.net/BXluQx4ige9GuW0Ia56BHw/97fe9ce5-4047-4492-b66c-c9eb99197d00/original' },
-  { handle: '@louzoshi', initials: 'LO', roles: 'dev · comunidade', posts: 33, territory: 'comunidade', avatarUrl: 'https://ipfs.skatehive.app/ipfs/bafkreieacx3evdxkmmxkehz7z7btjeto7ijaiavpfyg6dwenevql2mm2be?filename=skatehive.png' },
-  { handle: '@nogenta', initials: 'NO', roles: 'photo · film', posts: 14, territory: 'vídeo', avatarUrl: 'https://images.hive.blog/u/nogenta/avatar' },
+/** O diretório = cadastro do portal (bio, skills, roster) ⋈ curadoria local.
+ *  Regerar o lado do portal com `pnpm sync:people`; editar o resto em
+ *  people-overrides.ts, que também decide quem aparece (contas de marca da
+ *  allowlist ficam de fora por não terem entrada lá).
+ *  A ordem é a das chaves de PEOPLE_OVERRIDES. */
+const REMOTE_BY_USER = new Map(REMOTE_PEOPLE.map((p) => [p.username, p]))
+
+export const PEOPLE: Person[] = Object.entries(PEOPLE_OVERRIDES).flatMap(([username, o]) => {
+  const remote = REMOTE_BY_USER.get(username)
+  if (!remote) return [] // saiu da allowlist do portal — some do site até voltar
+  return [{
+    handle: `@${username}`,
+    initials: o.initials,
+    roles: o.roles,
+    territory: o.territory,
+    avatarUrl: o.avatarUrl ?? remote.avatarUrl ?? undefined,
+    bio: remote.bio,
+    skills: remote.skills,
+  }]
+})
+
+/** Quando o cadastro foi puxado do portal. */
+export { GENERATED_AT as PEOPLE_SYNCED_AT }
+
+/** Rotas no ar. `feed`, `projetos`, `capacidades` e `post` seguem no repo (as
+ *  páginas e o conteúdo de exemplo continuam em pages/), mas dependem de dados
+ *  que ainda não existem no portal — ver docs/cadastro-pessoas.md. Enquanto isso
+ *  saem da navegação E do router: a URL cai na home em vez de servir mock. */
+export const PUBLISHED_ROUTES: Route[] = ['home', 'pessoas', 'perfil', 'contato']
+
+/* declarado depois de PEOPLE porque o contador é derivado do diretório real */
+export const NAV: { route: Route; label: string; count?: string }[] = [
+  { route: 'home', label: 'home' },
+  { route: 'pessoas', label: 'pessoas', count: `(${PEOPLE.length})` },
+  { route: 'contato', label: 'contato' },
 ]
 
 /* Home "pessoas" preview cards */
