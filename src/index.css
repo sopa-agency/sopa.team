@@ -729,3 +729,24 @@ a {
     margin-top: 16px;
   }
 }
+
+/* manifesto escalonado: cada oração numa linha, alternando as bordas — a forma
+   repete o que a frase diz, pedaços que não se alinham e formam uma frase só */
+.manifesto-linhas {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  /* mono e menor de propósito: em display pesado o manifesto competia com o
+     CTA de contato, que é o único lugar da home que deve gritar */
+  font-family: var(--mono);
+  font-weight: 700;
+  font-size: clamp(13px, 1.75vw, 22px);
+  line-height: 1.45;
+  color: var(--ink);
+  margin: 18px 0 0;
+  align-items: center;
+  text-align: center;
+}
+.manifesto-en {
+  text-align: center;
+}

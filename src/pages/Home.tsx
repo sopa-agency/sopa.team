@@ -89,11 +89,13 @@ export function Home() {
       {/* manifesto — feed, projetos e capacidades saíram daqui junto com o mock */}
       <div style={{ ...section, padding: '38px 24px', background: 'var(--panel-alt)' }}>
         <div style={{ fontSize: 11, color: 'var(--faint)', marginBottom: 14 }}>/* manifesto */</div>
-        <p className="display" style={{ fontWeight: 700, fontSize: 23, lineHeight: 1.3, color: 'var(--ink)', margin: 0, maxWidth: '30ch' }}>
-          {PEOPLE.length} cabeças, repertórios que não combinam, e a teimosia de fazer junto. daí sai presença, produto e
-          cultura digital.
-        </p>
-        <p style={{ fontSize: 11.5, color: 'var(--faint)', margin: '16px 0 0' }}>
+        <div className="manifesto-linhas">
+          <span>{PEOPLE.length} cabeças,</span>
+          <span>repertórios que não combinam,</span>
+          <span>e a teimosia de fazer junto.</span>
+          <span>daí sai presença, produto e cultura digital.</span>
+        </div>
+        <p className="manifesto-en" style={{ fontSize: 11.5, color: 'var(--faint)', margin: '24px 0 0' }}>
           // the studio exists to turn individual production into collective force.
         </p>
       </div>
