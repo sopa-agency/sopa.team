@@ -100,6 +100,10 @@ export function useFeed({ pageSize = 20, author }: { pageSize?: number; author?:
       const id = ++run.current
       setStatus(after ? 'loading-more' : 'loading')
       setError(null)
+      // Carga nova (troca de pessoa ou de filtro) esvazia a lista na hora: sem
+      // isso os posts de quem estava aberto antes seguem na tela até a resposta
+      // chegar, e a página mente sobre de quem é aquele conteúdo.
+      if (!after) setEntries([])
       try {
         const qs = new URLSearchParams({ limit: String(pageSize) })
         if (f !== 'tudo') qs.set('platform', f)
@@ -140,7 +144,6 @@ export function useFeed({ pageSize = 20, author }: { pageSize?: number; author?:
     },
     setFilter: (f) => {
       setFilterState(f)
-      setEntries([])
       setCursor(null)
       void fetchPage(f, null)
     },
