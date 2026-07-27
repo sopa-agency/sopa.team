@@ -63,12 +63,13 @@ export { GENERATED_AT as PEOPLE_SYNCED_AT }
  *  páginas e o conteúdo de exemplo continuam em pages/), mas dependem de dados
  *  que ainda não existem no portal — ver docs/cadastro-pessoas.md. Enquanto isso
  *  saem da navegação E do router: a URL cai na home em vez de servir mock. */
-export const PUBLISHED_ROUTES: Route[] = ['home', 'pessoas', 'perfil', 'contato']
+export const PUBLISHED_ROUTES: Route[] = ['home', 'pessoas', 'perfil', 'feed', 'contato']
 
 /* declarado depois de PEOPLE porque o contador é derivado do diretório real */
 export const NAV: { route: Route; label: string; count?: string }[] = [
   { route: 'home', label: 'home' },
   { route: 'pessoas', label: 'pessoas', count: `(${PEOPLE.length})` },
+  { route: 'feed', label: 'feed' },
   { route: 'contato', label: 'contato' },
 ]
 
