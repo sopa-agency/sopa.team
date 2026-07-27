@@ -76,7 +76,7 @@ export type FeedState = {
  * não como .filter() sobre o que já veio — filtrar client-side sobre uma janela
  * paginada mentiria sobre o total.
  */
-export function useFeed(pageSize = 20): FeedState {
+export function useFeed({ pageSize = 20, author }: { pageSize?: number; author?: string } = {}): FeedState {
   const [entries, setEntries] = useState<FeedEntry[]>([])
   const [status, setStatus] = useState<FeedState['status']>('loading')
   const [cursor, setCursor] = useState<string | null>(null)
@@ -93,6 +93,8 @@ export function useFeed(pageSize = 20): FeedState {
       try {
         const qs = new URLSearchParams({ limit: String(pageSize) })
         if (f !== 'tudo') qs.set('platform', f)
+        // no perfil o feed é de uma pessoa só — filtro vai na requisição
+        if (author) qs.set('author', author)
         if (after) qs.set('cursor', after)
         const res = await fetch(`${API}/feed?${qs}`)
         const data = (await res.json()) as
@@ -110,7 +112,7 @@ export function useFeed(pageSize = 20): FeedState {
         setStatus('error')
       }
     },
-    [pageSize],
+    [pageSize, author],
   )
 
   useEffect(() => {
