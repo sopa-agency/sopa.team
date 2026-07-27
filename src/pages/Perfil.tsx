@@ -54,23 +54,18 @@ export function Perfil({ handle }: { handle?: string }) {
         </>
       }
     >
-      {/* header */}
+      {/* perfil e skills dividem a primeira dobra — são as duas leituras da
+          pessoa: quem é (bio) e o que faz (scores) */}
+      <div className="perfil-top">
       <Panel tag="[ perfil ]" style={{ padding: '22px 18px 18px' }}>
-        <div className="perfil-head" style={{ display: 'grid', gridTemplateColumns: '150px 1fr', gap: 20 }}>
+        <div className="perfil-head" style={{ display: 'grid', gridTemplateColumns: '116px 1fr', gap: 18 }}>
           <Avatar src={person.avatarUrl} initials={person.initials} fill style={{ border: '1px solid rgba(var(--line-rgb), .22)' }} />
           <div>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 16, flexWrap: 'wrap' }}>
-              <div>
-                <div className="display" style={{ fontWeight: 900, fontSize: 38, letterSpacing: '-.02em', lineHeight: 0.95, color: 'var(--ink)' }}>
-                  {person.handle}
-                </div>
-                <div style={{ fontSize: 12, color: 'var(--muted)', marginTop: 5 }}>
-                  <span style={{ color: 'var(--ink-strong)', textTransform: 'uppercase' }}>{person.roles}</span>
-                </div>
-              </div>
-              <div style={{ textAlign: 'right' }}>
-                <div data-route="contato" className="btn-yellow" style={{ fontSize: 12, padding: '8px 14px', marginTop: 8, cursor: 'pointer' }}>chamar pra projeto →</div>
-              </div>
+            <div className="display" style={{ fontWeight: 900, fontSize: 34, letterSpacing: '-.02em', lineHeight: 0.95, color: 'var(--ink)' }}>
+              {person.handle}
+            </div>
+            <div style={{ fontSize: 12, color: 'var(--muted)', marginTop: 5 }}>
+              <span style={{ color: 'var(--ink-strong)', textTransform: 'uppercase' }}>{person.roles}</span>
             </div>
             {/* bio vem do cadastro no portal; sem bio, o perfil não inventa uma */}
             <p style={{ fontSize: 12.5, lineHeight: 1.65, color: person.bio ? 'var(--body)' : 'var(--faint)', margin: '14px 0 0', maxWidth: '60ch' }}>
@@ -102,6 +97,7 @@ export function Perfil({ handle }: { handle?: string }) {
           ))}
         </Panel>
       )}
+      </div>
 
       {/* timeline da pessoa: mesmo card do /feed, sem o bloco de autor —
           repetir o mesmo avatar a cada post na página dela é ruído */}
