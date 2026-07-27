@@ -1,5 +1,6 @@
 import type { ReactNode } from 'react'
 import { NAV, PEOPLE } from '../data'
+import { Avatar } from './ui'
 import type { Route } from '../data'
 import { navigate, useRouteDelegate, href } from '../router'
 import { useTheme, cycleTheme, themeLabel } from '../theme'
@@ -44,6 +45,10 @@ function Chrome({ path, meta, bottom }: { path: string; meta: ReactNode; bottom?
   )
 }
 
+/** Diretório em ordem alfabética — a de PEOPLE é curatorial (ordem do arquivo
+ *  de overrides), que não ajuda quem procura um nome na lista. */
+const ROSTER = [...PEOPLE].sort((a, b) => a.handle.localeCompare(b.handle, 'pt-BR'))
+
 function Sidebar({
   active,
   leaf,
@@ -67,7 +72,25 @@ function Sidebar({
                 <div className="child">
                   ▾ {n.label} {n.count && <span className="count">{n.count}</span>}
                 </div>
-                <div className="leaf">· {leaf.label}</div>
+                {/* dentro de um perfil o galho abre o diretório inteiro, em ordem
+                    alfabética — dá pra pular de pessoa em pessoa sem voltar */}
+                {n.route === 'pessoas'
+                  ? ROSTER.map((p) => {
+                      const slug = p.handle.slice(1)
+                      return (
+                        <a
+                          key={p.handle}
+                          className={'leaf' + (leaf.label === p.handle ? ' on' : '')}
+                          data-route="perfil"
+                          data-param={slug}
+                          href={href('perfil', slug)}
+                        >
+                          <Avatar src={p.avatarUrl} initials={p.initials} size={17} />
+                          {slug}
+                        </a>
+                      )
+                    })
+                  : <div className="leaf on">· {leaf.label}</div>}
               </div>
             )
           }

@@ -299,11 +299,24 @@ a {
   margin-left: 8px;
 }
 .tree .leaf {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  color: var(--muted);
+  padding: 4px 8px;
+  margin-left: 18px;
+  font-size: 11.5px;
+  cursor: pointer;
+  transition: background 0.12s, color 0.12s;
+}
+/* só a pessoa aberta fica marcada — antes o realce era do único item da lista */
+.tree .leaf.on {
   background: rgba(var(--accent-rgb), 0.13);
   color: var(--ink-strong);
-  padding: 5px 8px;
-  margin-left: 20px;
-  font-size: 11.5px;
+}
+.tree .leaf:hover {
+  background: rgba(var(--accent-rgb), 0.22);
+  color: var(--ink-strong);
 }
 .sidebar .sysbox {
   margin-top: 20px;
