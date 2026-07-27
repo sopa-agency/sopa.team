@@ -106,35 +106,41 @@ export function Perfil({ handle }: { handle?: string }) {
       {/* timeline da pessoa: mesmo card do /feed, sem o bloco de autor —
           repetir o mesmo avatar a cada post na página dela é ruído */}
       <Panel tag="[ o que tem postado ]">
-        {/* mesma coluna de leitura do /feed: sem isso o vídeo ocupa a largura
-            inteira do painel e desequilibra a página */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 10, maxWidth: 620, margin: '0 auto', width: '100%' }}>
-          {feed.status === 'loading' && <FeedNotice title="carregando…" />}
+        {/* duas colunas que encaixam: `columns` do CSS empacota por altura, então
+            card curto e card com vídeo convivem sem buraco. Custo assumido: a
+            leitura desce a primeira coluna e volta pro topo da segunda. */}
+        <div className="post-grid">
+          {feed.status === 'loading' && <div className="post-cell"><FeedNotice title="carregando…" /></div>}
 
           {feed.status === 'error' && (
-            <FeedNotice title="não deu pra carregar os posts." sub={feed.error ?? undefined} />
+            <div className="post-cell"><FeedNotice title="não deu pra carregar os posts." sub={feed.error ?? undefined} /></div>
           )}
 
           {feed.status === 'ready' && feed.entries.length === 0 && (
-            <FeedNotice title={`${person.handle} ainda não postou no Hive nem no Farcaster.`} />
+            <div className="post-cell"><FeedNotice title={`${person.handle} ainda não postou no Hive nem no Farcaster.`} /></div>
           )}
 
-          {feed.entries.map((e) => <FeedPostCard key={e.id} entry={e} compact />)}
+          {feed.entries.map((e) => (
+            <div key={e.id} className="post-cell">
+              <FeedPostCard entry={e} />
+            </div>
+          ))}
 
-          {feed.entries.length > 0 && feed.cursor && (
-            <button
-              type="button"
-              onClick={feed.loadMore}
-              disabled={feed.status === 'loading-more'}
-              style={{
-                width: '100%', font: 'inherit', fontSize: 12, padding: 12, cursor: 'pointer',
-                background: 'none', color: 'var(--ink)', border: '1px solid var(--line)',
-              }}
-            >
-              {feed.status === 'loading-more' ? '[ carregando… ]' : '[ carregar mais ▾ ]'}
-            </button>
-          )}
         </div>
+
+        {feed.entries.length > 0 && feed.cursor && (
+          <button
+            type="button"
+            onClick={feed.loadMore}
+            disabled={feed.status === 'loading-more'}
+            style={{
+              width: '100%', font: 'inherit', fontSize: 12, padding: 12, marginTop: 10, cursor: 'pointer',
+              background: 'none', color: 'var(--ink)', border: '1px solid var(--line)',
+            }}
+          >
+            {feed.status === 'loading-more' ? '[ carregando… ]' : '[ carregar mais ▾ ]'}
+          </button>
+        )}
       </Panel>
     </Frame>
   )

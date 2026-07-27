@@ -2,9 +2,7 @@ import { Avatar } from './ui'
 import { shortAgo, sourceLabel, type FeedEntry, type FeedMedia } from '../feed'
 
 /* O card de post da timeline. Vive aqui porque duas páginas o usam: a /feed
- * (timeline coletiva) e o /perfil (timeline de uma pessoa só). No perfil ele
- * vai `compact`, sem o bloco de autor — repetir o mesmo avatar vinte vezes na
- * página da própria pessoa é ruído. */
+ * (timeline coletiva) e o /perfil (timeline de uma pessoa só, em duas colunas). */
 
 /** Uma célula de mídia. Vídeo é arquivo direto (ipfs/farcaster), toca nativo. */
 function Cell({ item, ratio }: { item: FeedMedia; ratio: string }) {
@@ -136,14 +134,12 @@ function Linkify({ text }: { text: string }) {
   )
 }
 
-export function FeedPostCard({ entry, compact = false }: { entry: FeedEntry; compact?: boolean }) {
+export function FeedPostCard({ entry }: { entry: FeedEntry }) {
   const p = entry.person
   return (
     <article style={{ border: '1px solid var(--line)', background: 'var(--panel)', padding: '14px 16px' }}>
       <div style={{ display: 'flex', alignItems: 'center', gap: 9 }}>
-        {/* no perfil o autor é sempre o mesmo, então o bloco sai */}
-        {!compact && (
-          <div
+        <div
             {...(p ? { 'data-route': 'perfil', 'data-param': entry.author } : {})}
             style={{ display: 'flex', alignItems: 'center', gap: 9, minWidth: 0, cursor: p ? 'pointer' : 'default' }}
           >
@@ -156,8 +152,7 @@ export function FeedPostCard({ entry, compact = false }: { entry: FeedEntry; com
                 </span>
               )}
             </div>
-          </div>
-        )}
+        </div>
         {/* origem + horário são UM alvo só, e apontam pra fora (o autor, ao
             lado, aponta pra dentro do site) */}
         {entry.url ? (

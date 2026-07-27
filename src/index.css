@@ -662,3 +662,19 @@ a {
   outline: 1px solid var(--ink-strong);
   outline-offset: 1px;
 }
+
+/* grade de posts do perfil: duas colunas que empacotam por altura (masonry via
+   `columns`), pra card curto e card com vídeo conviverem sem buraco */
+.post-grid {
+  columns: 2;
+  column-gap: 10px;
+}
+.post-cell {
+  break-inside: avoid;
+  margin-bottom: 10px;
+}
+@media (max-width: 900px) {
+  .post-grid {
+    columns: 1;
+  }
+}
