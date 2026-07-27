@@ -715,6 +715,11 @@ a {
 .perfil-top + .panel {
   margin-top: 16px;
 }
+/* quem ainda não preencheu skills tem um painel só — uma coluna, sem meia
+   grade vazia. A classe base permanece pra margem acima continuar valendo. */
+.perfil-top.solo {
+  grid-template-columns: 1fr;
+}
 @media (max-width: 1040px) {
   .perfil-top {
     grid-template-columns: 1fr;

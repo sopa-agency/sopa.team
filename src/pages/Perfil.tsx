@@ -56,9 +56,10 @@ export function Perfil({ handle }: { handle?: string }) {
     >
       {/* perfil e skills dividem a primeira dobra — são as duas leituras da
           pessoa: quem é (bio) e o que faz (scores) */}
-      {/* sem skills preenchidos a grade ficaria com metade vazia, então o
-          perfil ocupa a largura toda */}
-      <div className={skills.length > 0 ? 'perfil-top' : undefined}>
+      {/* a classe fica SEMPRE: é ela que o seletor de margem do painel de baixo
+          enxerga. Sem skills o modificador `solo` só troca pra uma coluna, em
+          vez de a grade ficar com metade vazia. */}
+      <div className={'perfil-top' + (skills.length > 0 ? '' : ' solo')}>
       <Panel tag="[ perfil ]" style={{ padding: '22px 18px 18px' }}>
         <div className="perfil-head" style={{ display: 'grid', gridTemplateColumns: '116px 1fr', gap: 18 }}>
           <Avatar src={person.avatarUrl} initials={person.initials} fill style={{ border: '1px solid rgba(var(--line-rgb), .22)' }} />
