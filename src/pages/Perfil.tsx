@@ -56,7 +56,9 @@ export function Perfil({ handle }: { handle?: string }) {
     >
       {/* perfil e skills dividem a primeira dobra — são as duas leituras da
           pessoa: quem é (bio) e o que faz (scores) */}
-      <div className="perfil-top">
+      {/* sem skills preenchidos a grade ficaria com metade vazia, então o
+          perfil ocupa a largura toda */}
+      <div className={skills.length > 0 ? 'perfil-top' : undefined}>
       <Panel tag="[ perfil ]" style={{ padding: '22px 18px 18px' }}>
         <div className="perfil-head" style={{ display: 'grid', gridTemplateColumns: '116px 1fr', gap: 18 }}>
           <Avatar src={person.avatarUrl} initials={person.initials} fill style={{ border: '1px solid rgba(var(--line-rgb), .22)' }} />
@@ -101,7 +103,7 @@ export function Perfil({ handle }: { handle?: string }) {
 
       {/* timeline da pessoa: mesmo card do /feed, sem o bloco de autor —
           repetir o mesmo avatar a cada post na página dela é ruído */}
-      <Panel tag="[ o que tem postado ]">
+      <Panel tag="[ o que tem postado ]" bare>
         {/* duas colunas que encaixam: `columns` do CSS empacota por altura, então
             card curto e card com vídeo convivem sem buraco. Custo assumido: a
             leitura desce a primeira coluna e volta pro topo da segunda. */}

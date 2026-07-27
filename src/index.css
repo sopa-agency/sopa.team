@@ -379,6 +379,11 @@ a {
   border-color: var(--line-yellow);
   background: var(--panel-alt);
 }
+/* só a moldura: o conteúdo dentro já tem fundo próprio (cards do feed), e dois
+   fundos empilhados criavam uma faixa a mais sem informação nenhuma */
+.panel.bare {
+  background: transparent;
+}
 .panel > .tag {
   position: absolute;
   top: -8px;

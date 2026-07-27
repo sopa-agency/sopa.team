@@ -84,16 +84,19 @@ export function Panel({
   children,
   tight,
   accent,
+  bare,
   style,
 }: {
   tag: string
   children: ReactNode
   tight?: boolean
   accent?: boolean
+  /** sem preenchimento: pra quando o conteúdo já traz o próprio fundo */
+  bare?: boolean
   style?: CSSProperties
 }) {
   return (
-    <div className={'panel' + (tight ? ' tight' : '') + (accent ? ' accent' : '')} style={style}>
+    <div className={'panel' + (tight ? ' tight' : '') + (accent ? ' accent' : '') + (bare ? ' bare' : '')} style={style}>
       <span className="tag">{tag}</span>
       {children}
     </div>
