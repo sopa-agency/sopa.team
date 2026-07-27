@@ -652,3 +652,13 @@ a {
     padding: 22px 12px 14px;
   }
 }
+
+/* origem do post no feed: o bloco todo é um alvo só */
+.src-link:hover {
+  color: var(--ink-strong);
+  background: rgba(var(--accent-rgb), 0.1);
+}
+.src-link:focus-visible {
+  outline: 1px solid var(--ink-strong);
+  outline-offset: 1px;
+}

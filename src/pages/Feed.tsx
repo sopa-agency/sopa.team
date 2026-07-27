@@ -14,8 +14,11 @@ const FILTERS: FeedFilter[] = ['tudo', 'hive', 'farcaster']
 
 /** Uma célula de mídia. Vídeo é arquivo direto (ipfs/farcaster), toca nativo. */
 function Cell({ item, ratio }: { item: FeedMedia; ratio: string }) {
+  // `width` explícito é o que impede a caixa de encolher: com aspect-ratio +
+  // max-height, o navegador deriva a largura da altura limitada e sobra fundo
+  // do lado. Com a largura fixa, quem cede é a altura e o cover recorta.
   const box: React.CSSProperties = {
-    aspectRatio: ratio, maxHeight: '70vh',
+    width: '100%', aspectRatio: ratio, maxHeight: '70vh',
     background: 'var(--panel-alt)', overflow: 'hidden', position: 'relative',
   }
   const fill: React.CSSProperties = { width: '100%', height: '100%', objectFit: 'cover', display: 'block' }
@@ -105,6 +108,40 @@ function Embeds({ items }: { items: FeedMedia[] }) {
   )
 }
 
+const URL_RE = /(https?:\/\/[^\s<>"']+)/g
+
+/**
+ * Transforma URL em link montando ELEMENTOS React — o texto vem do Hive e do
+ * Farcaster, então nunca passa por dangerouslySetInnerHTML.
+ */
+function Linkify({ text }: { text: string }) {
+  const parts = text.split(URL_RE)
+  return (
+    <>
+      {parts.map((part, i) => {
+        if (i % 2 === 0) return part
+        // pontuação final costuma ser da frase, não da URL
+        const m = /[.,;:!?)\]]+$/.exec(part)
+        const href = m ? part.slice(0, -m[0].length) : part
+        return (
+          <span key={i}>
+            <a
+              href={href}
+              target="_blank"
+              rel="noopener noreferrer"
+              onClick={(e) => e.stopPropagation()}
+              style={{ color: 'var(--ink-strong)', textDecoration: 'underline', textUnderlineOffset: 2, overflowWrap: 'anywhere' }}
+            >
+              {href}
+            </a>
+            {m ? m[0] : null}
+          </span>
+        )
+      })}
+    </>
+  )
+}
+
 function Post({ entry }: { entry: FeedEntry }) {
   const p = entry.person
   return (
@@ -125,16 +162,30 @@ function Post({ entry }: { entry: FeedEntry }) {
             )}
           </div>
         </div>
-        <div style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: 9, fontSize: 10.5, color: 'var(--muted)', whiteSpace: 'nowrap' }}>
-          <span>{sourceLabel(entry)}</span>
-          {entry.url ? (
-            <a href={entry.url} target="_blank" rel="noopener noreferrer" title={new Date(entry.postedAt).toLocaleString('pt-BR')} style={{ color: 'inherit', textDecoration: 'none' }}>
-              {shortAgo(entry.postedAt)} ↗
-            </a>
-          ) : (
+        {/* origem + horário são UM alvo só, e apontam pra fora (o autor, ao
+            lado, aponta pra dentro do site) */}
+        {entry.url ? (
+          <a
+            href={entry.url}
+            target="_blank"
+            rel="noopener noreferrer"
+            title={`abrir em ${entry.platform === 'hive' ? 'skatehive' : 'warpcast'} · ${new Date(entry.postedAt).toLocaleString('pt-BR')}`}
+            className="src-link"
+            style={{
+              marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: 7,
+              fontSize: 10.5, color: 'var(--muted)', whiteSpace: 'nowrap',
+              textDecoration: 'none', padding: '3px 6px', margin: '-3px -6px -3px auto',
+            }}
+          >
+            <span>{sourceLabel(entry)}</span>
+            <span>{shortAgo(entry.postedAt)} ↗</span>
+          </a>
+        ) : (
+          <div style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: 7, fontSize: 10.5, color: 'var(--muted)', whiteSpace: 'nowrap' }}>
+            <span>{sourceLabel(entry)}</span>
             <span>{shortAgo(entry.postedAt)}</span>
-          )}
-        </div>
+          </div>
+        )}
       </div>
 
       {entry.kind === 'blog' && entry.text && (
@@ -150,7 +201,7 @@ function Post({ entry }: { entry: FeedEntry }) {
           fontSize: entry.media.length === 0 ? 14 : 12.5,
           lineHeight: entry.media.length === 0 ? 1.7 : 1.62,
         }}>
-          {entry.text}
+          <Linkify text={entry.text} />
         </p>
       )}
 
@@ -200,8 +251,9 @@ export function Feed() {
       footerLabel="sopa://feed — timeline agregada"
       footerMeta={<><span>{feed.entries.length} carregados</span><span>PT/EN</span><ThemeDot /></>}
     >
-      <div className="tl" style={{
-        position: 'sticky', top: 0, zIndex: 5, background: 'var(--bg)',
+      {/* sem sticky: a barra cobria o topo do primeiro post e competia com o
+          chrome, que já é fixo e carrega a rota */}
+      <div style={{
         borderBottom: '1px solid var(--line)', padding: '11px 4px',
         display: 'flex', alignItems: 'center', gap: 9, flexWrap: 'wrap',
         maxWidth: 620, margin: '0 auto', width: '100%',
