@@ -8,8 +8,15 @@ const API =
 
 export type FeedKind = 'snap' | 'blog' | 'cast'
 export type FeedPlatform = 'hive' | 'farcaster'
-/** `embed` = player de terceiro (skatehype, odysee…): não é arquivo, vira link. */
-export type FeedMedia = { type: 'image' | 'video' | 'embed'; url: string }
+/** `embed` = player de terceiro ou HLS: não toca em <video>, vira link.
+ *  `link`  = site citado no post, com Open Graph já resolvido na captura. */
+export type FeedMedia = {
+  type: 'image' | 'video' | 'embed' | 'link'
+  url: string
+  title?: string | null
+  description?: string | null
+  image?: string | null
+}
 
 export type FeedPost = {
   id: string
@@ -27,9 +34,11 @@ export type FeedPost = {
 export type FeedEntry = FeedPost & {
   /** null quando o autor não está no diretório — aí o nome não vira link */
   person: Person | null
-  /** mídia que dá pra renderizar inline, separada da que precisa de iframe */
+  /** mídia que dá pra renderizar inline, separada da que só vira link */
   inline: FeedMedia[]
   embeds: FeedMedia[]
+  /** sites citados, com preview de Open Graph */
+  links: FeedMedia[]
 }
 
 export type FeedFilter = 'tudo' | 'hive' | 'farcaster'
@@ -40,8 +49,9 @@ function hydrate(post: FeedPost): FeedEntry {
   return {
     ...post,
     person: byHandle.get(post.author) ?? null,
-    inline: post.media.filter((m) => m.type !== 'embed'),
+    inline: post.media.filter((m) => m.type === 'image' || m.type === 'video'),
     embeds: post.media.filter((m) => m.type === 'embed'),
+    links: post.media.filter((m) => m.type === 'link'),
   }
 }
 

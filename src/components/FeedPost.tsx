@@ -134,6 +134,45 @@ function Linkify({ text }: { text: string }) {
   )
 }
 
+/** Preview do site citado: imagem de OG, título e host. O dado vem resolvido
+ *  do backend, então aqui não se busca nada. */
+function LinkPreviews({ items }: { items: FeedMedia[] }) {
+  if (items.length === 0) return null
+  return (
+    <div style={{ marginTop: 10, display: 'flex', flexDirection: 'column', gap: 6 }}>
+      {items.map((m, i) => {
+        let host = ''
+        try { host = new URL(m.url).host.replace(/^www\./, '') } catch { /* fica vazio */ }
+        return (
+          <a
+            key={i} href={m.url} target="_blank" rel="noopener noreferrer"
+            style={{ display: 'block', textDecoration: 'none', border: '1px solid var(--line)', background: 'var(--panel-alt)', overflow: 'hidden' }}
+          >
+            {m.image && (
+              <div style={{ width: '100%', aspectRatio: '1.91', background: 'var(--hatch)', overflow: 'hidden' }}>
+                <img
+                  src={m.image} alt="" loading="lazy"
+                  style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
+                  onError={(e) => { e.currentTarget.style.display = 'none' }}
+                />
+              </div>
+            )}
+            <div style={{ padding: '9px 11px' }}>
+              {host && <div style={{ fontSize: 10, color: 'var(--faint)', textTransform: 'uppercase', letterSpacing: '.05em' }}>{host}</div>}
+              {m.title && (
+                <div style={{ fontSize: 12.5, color: 'var(--ink)', fontWeight: 700, marginTop: 3, overflowWrap: 'anywhere' }}>{m.title}</div>
+              )}
+              {m.description && (
+                <div style={{ fontSize: 11, color: 'var(--muted)', marginTop: 3, lineHeight: 1.5, overflowWrap: 'anywhere' }}>{m.description}</div>
+              )}
+            </div>
+          </a>
+        )
+      })}
+    </div>
+  )
+}
+
 export function FeedPostCard({ entry }: { entry: FeedEntry }) {
   const p = entry.person
   return (
@@ -180,7 +219,7 @@ export function FeedPostCard({ entry }: { entry: FeedEntry }) {
       </div>
 
       {entry.kind === 'blog' && entry.text && (
-        <div className="display" style={{ fontWeight: 800, fontSize: 17, color: 'var(--ink)', margin: '9px 0 0', letterSpacing: '-.01em' }}>
+        <div className="display" style={{ fontWeight: 800, fontSize: 17, color: 'var(--ink)', margin: '9px 0 0', letterSpacing: '-.01em', overflowWrap: 'anywhere' }}>
           {entry.text}
         </div>
       )}
@@ -197,6 +236,7 @@ export function FeedPostCard({ entry }: { entry: FeedEntry }) {
       )}
 
       <Media items={entry.inline} />
+      <LinkPreviews items={entry.links} />
       <Embeds items={entry.embeds} />
     </article>
   )
